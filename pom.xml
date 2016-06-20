@@ -26,14 +26,22 @@
 			<artifactId>spring-boot-starter-jersey</artifactId>
 		</dependency>
 
+        <!-- for OAuth 2.0 -->
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>		
-		
+		</dependency>
+
 	</dependencies>
+
+    <repositories />
 
 	<build>
 		<plugins>
