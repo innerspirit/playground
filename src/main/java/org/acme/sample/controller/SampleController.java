@@ -17,11 +17,7 @@ public class SampleController {
 
 	@GET
 	@Path("/hello")
-	public String hello(@QueryParam("name") String name) throws AuthenticationException {
-        if (name != null) {
-            return "Hello " + name;
-        }
-
+	public String hello() throws AuthenticationException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof UserDetails) {
             UserDetails details = (UserDetails) authentication.getPrincipal();
