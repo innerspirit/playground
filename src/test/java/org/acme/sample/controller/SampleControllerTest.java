@@ -29,6 +29,15 @@ public class SampleControllerTest {
 	@Value("${local.server.port}")
     private int port;
 
+    @Value("${spring.jersey.application-path}")
+    private String basePath;
+
+    @Value("${security.oauth2.client.client-id}")
+    private String clientId;
+
+    @Value("${security.oauth2.client.client-secret}")
+    private String clientSecret;
+
     private DefaultOAuth2ClientContext clientContext;
 
     private ResourceOwnerPasswordResourceDetails resourceDetails;
@@ -39,8 +48,8 @@ public class SampleControllerTest {
         resourceDetails.setUsername("chris");
         resourceDetails.setPassword("prueba");
         resourceDetails.setAccessTokenUri(format("http://localhost:%d/oauth/token", port));
-        resourceDetails.setClientId("acme");
-        resourceDetails.setClientSecret("acmesecret");
+        resourceDetails.setClientId(clientId);
+        resourceDetails.setClientSecret(clientSecret);
         resourceDetails.setGrantType("password");
         resourceDetails.setScope(asList("read", "write"));
 
@@ -65,6 +74,6 @@ public class SampleControllerTest {
 	}
 
 	private String getUrl(String path) {
-		return "http://localhost:" + port + "/api" + path;
+		return "http://localhost:" + port + basePath + path;
 	}
 }
