@@ -23,6 +23,14 @@ public class Note {
     }
 
     public Note(String text) {
+        setText(text);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setText(String text) {
         this.text = text;
     }
 
