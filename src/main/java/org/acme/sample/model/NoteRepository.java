@@ -4,7 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import javax.transaction.Transactional;
 
 @Transactional
-public interface NoteDao extends CrudRepository<Note, Long> {
+public interface NoteRepository extends CrudRepository<Note, Long> {
 
     public Note findByText(String text);
 

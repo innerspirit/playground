@@ -4,21 +4,21 @@ import org.acme.sample.model.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.Path;
-import org.acme.sample.model.NoteDao;
+import org.acme.sample.model.NoteRepository;
 
 @Component
 @Path("/notes")
 public class NoteController {
 
     @Autowired
-    private NoteDao NoteDao;
+    private NoteRepository NoteRepository;
 
     @Path("/create")
     public String create(String text) {
         String NoteId = "";
         try {
             Note Note = new Note(text);
-            NoteDao.save(Note);
+            NoteRepository.save(Note);
             NoteId = String.valueOf(Note.getId());
         }
         catch (Exception ex) {
@@ -31,7 +31,7 @@ public class NoteController {
     public String getByText(String text) {
         String NoteId = "";
         try {
-            Note Note = NoteDao.findByText(text);
+            Note Note = NoteRepository.findByText(text);
             NoteId = String.valueOf(Note.getId());
         }
         catch (Exception ex) {
@@ -43,9 +43,9 @@ public class NoteController {
     @Path("/update")
     public String updateNote(long id, String text) {
         try {
-            Note Note = NoteDao.findOne(id);
+            Note Note = NoteRepository.findOne(id);
             Note.setText(text);
-            NoteDao.save(Note);
+            NoteRepository.save(Note);
         }
         catch (Exception ex) {
             return "Error updating the note: " + ex.toString();
