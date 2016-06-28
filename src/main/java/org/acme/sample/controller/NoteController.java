@@ -3,18 +3,20 @@ package org.acme.sample.controller;
 import org.acme.sample.model.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+
 import org.acme.sample.model.NoteRepository;
 
 @Component
-@Path("/notes")
+@Path("/notes/{id}")
 public class NoteController {
 
     @Autowired
     private NoteRepository NoteRepository;
 
+    @POST
     @Path("/create")
-    public String create(String text) {
+    public String create(@FormParam("text") String text) {
         String NoteId = "";
         try {
             Note Note = new Note(text);
@@ -24,11 +26,12 @@ public class NoteController {
         catch (Exception ex) {
             return "Error creating the note: " + ex.toString();
         }
-        return "Note succesfully created with id = " + NoteId;
+        return "Note successfully created with id = " + NoteId;
     }
 
+    @GET
     @Path("/find")
-    public String getByText(String text) {
+    public String getByText(@QueryParam("text") String text) {
         String NoteId = "";
         try {
             Note Note = NoteRepository.findByText(text);
@@ -37,11 +40,12 @@ public class NoteController {
         catch (Exception ex) {
             return "Note not found";
         }
-        return "The Note id is: " + NoteId;
+        return "The note id is: " + NoteId;
     }
 
+    @PUT
     @Path("/update")
-    public String updateNote(long id, String text) {
+    public String updateNote(@PathParam("id") long id, @FormParam("text") String text) {
         try {
             Note Note = NoteRepository.findOne(id);
             Note.setText(text);
@@ -50,7 +54,7 @@ public class NoteController {
         catch (Exception ex) {
             return "Error updating the note: " + ex.toString();
         }
-        return "Note succesfully updated!";
+        return "Note successfully updated!";
     }
 
 }
