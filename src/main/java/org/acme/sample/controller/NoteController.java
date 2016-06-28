@@ -4,6 +4,7 @@ import org.acme.sample.model.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 import org.acme.sample.model.NoteRepository;
 
@@ -45,6 +46,7 @@ public class NoteController {
 
     @PUT
     @Path("/update")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String updateNote(@PathParam("id") long id, @FormParam("text") String text) {
         try {
             Note Note = NoteRepository.findOne(id);
