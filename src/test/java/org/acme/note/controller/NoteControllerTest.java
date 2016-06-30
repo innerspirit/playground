@@ -113,6 +113,27 @@ public class NoteControllerTest {
         }
     }
 
+    @Test
+    public void find() {
+        restTemplate = new OAuth2RestTemplate(resourceDetails, clientContext);
+        final HashMap<String, String> map1 = new HashMap<String, String>(1);
+        map1.put("text", "prueba");
+
+        try {
+            this.restTemplate.postForObject(getUrl("/notes"), map1, String.class);
+
+            ResponseEntity<String> newEntity = this.restTemplate.getForEntity(
+                    getUrl("/notes/find"), String.class, map1);
+            String newBody = newEntity.getBody();
+
+            assertEquals(HttpStatus.OK, newEntity.getStatusCode());
+            assertTrue(newBody.matches("The note id is: [0-9]+"));
+
+        } catch(HttpStatusCodeException ex) {
+            logger.error(ex.getResponseBodyAsString());
+        }
+    }
+
 	private String getUrl(String path) {
 		return "http://localhost:" + port + basePath + path;
 	}
