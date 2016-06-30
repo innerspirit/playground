@@ -24,11 +24,11 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.HashMap;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
@@ -72,17 +72,46 @@ public class NoteControllerTest {
 	@Test
 	public void create() {
         restTemplate = new OAuth2RestTemplate(resourceDetails, clientContext);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("text", "prueba");
+        final HashMap<String, String> map =  new HashMap<String, String>(1);
+        map.put("text", "prueba");
 
         try {
-            URI resultUri = this.restTemplate.postForLocation(
-                    getUrl("/notes/create"), map);
-            assertTrue(resultUri.getPath().matches("/notes/[0-9]+"));
+            String result = this.restTemplate.postForObject(
+                    getUrl("/notes"), map, String.class);
+            assertTrue(result.startsWith("Note successfully created"));
         } catch(HttpStatusCodeException ex) {
             logger.error(ex.getResponseBodyAsString());
         }
 	}
+
+    @Test
+    public void update() {
+        restTemplate = new OAuth2RestTemplate(resourceDetails, clientContext);
+        final HashMap<String, String> map1 = new HashMap<String, String>(1);
+        map1.put("text", "prueba");
+        final HashMap<String, String> map2 = new HashMap<String, String>(1);
+        map2.put("text", "nuevo valor");
+
+        try {
+            String result = this.restTemplate.postForObject(
+                    getUrl("/notes"), map1, String.class);
+
+            assertTrue(result.startsWith("Note successfully created"));
+            Integer noteId = Integer.parseInt(result.replaceAll("Note successfully created with id = ", ""));
+
+            this.restTemplate.put(getUrl("/notes/"+noteId), map2);
+
+            ResponseEntity<String> newEntity = this.restTemplate.getForEntity(
+                    getUrl("/notes/find"), String.class, map2);
+            String newBody = newEntity.getBody();
+
+            assertEquals(HttpStatus.OK, newEntity.getStatusCode());
+            assertTrue(newBody.matches("The note id is: [0-9]+"));
+
+        } catch(HttpStatusCodeException ex) {
+            logger.error(ex.getResponseBodyAsString());
+        }
+    }
 
 	private String getUrl(String path) {
 		return "http://localhost:" + port + basePath + path;

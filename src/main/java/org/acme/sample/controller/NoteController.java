@@ -9,14 +9,14 @@ import javax.ws.rs.core.MediaType;
 import org.acme.sample.model.NoteRepository;
 
 @Component
-@Path("/notes/{id}")
+@Path("/notes")
 public class NoteController {
 
     @Autowired
     private NoteRepository NoteRepository;
 
     @POST
-    @Path("/create")
+    @Path("/")
     public String create(@FormParam("text") String text) {
         String NoteId = "";
         try {
@@ -45,7 +45,7 @@ public class NoteController {
     }
 
     @PUT
-    @Path("/update")
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String updateNote(@PathParam("id") long id, @FormParam("text") String text) {
         try {
