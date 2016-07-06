@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -85,32 +85,24 @@ public class NoteControllerTest {
 	}
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:notes.sql")
     public void update() {
         restTemplate = new OAuth2RestTemplate(resourceDetails, clientContext);
-        final HashMap<String, String> map1 = new HashMap<String, String>(1);
-        map1.put("text", "prueba");
-        final HashMap<String, String> map2 = new HashMap<String, String>(1);
-        map2.put("text", "nuevo valor");
+        final MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>(1);
+        map.add("text", "nuevo valor");
 
-        try {
-            String result = this.restTemplate.postForObject(
-                    getUrl("/notes"), map1, String.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            assertTrue(result.startsWith("Note successfully created"));
-            Integer noteId = Integer.parseInt(result.replaceAll("Note successfully created with id = ", ""));
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        this.restTemplate.put(getUrl("/notes/35"), request);
 
-            this.restTemplate.put(getUrl("/notes/"+noteId), map2);
+        ResponseEntity<String> newEntity = this.restTemplate.getForEntity(
+                getUrl("/notes/find"), String.class, map);
+        String newBody = newEntity.getBody();
 
-            ResponseEntity<String> newEntity = this.restTemplate.getForEntity(
-                    getUrl("/notes/find"), String.class, map2);
-            String newBody = newEntity.getBody();
-
-            assertEquals(HttpStatus.OK, newEntity.getStatusCode());
-            assertTrue(newBody.matches("The note id is: [0-9]+"));
-
-        } catch(HttpStatusCodeException ex) {
-            logger.error(ex.getResponseBodyAsString());
-        }
+        assertEquals(HttpStatus.OK, newEntity.getStatusCode());
+        assertTrue(newBody.matches("The note id is: 35"));
     }
 
     @Test

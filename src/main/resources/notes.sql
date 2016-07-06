@@ -1,0 +1,1 @@
+INSERT INTO notes (id, text) VALUES (35, 'texto prueba');
